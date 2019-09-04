@@ -2,6 +2,34 @@
 
 Módulo para integração do sistema de persistência adotado com a aplicação, estas classes devem encapsular e abstrair juntamente com as do módulo de entidades toda a camada de persistência de forma a torna-la independente do sistema adotado, a aplicação não deve estar acoplada diretamente ao sistema de persistência final escolhido.
 
+```
+    users: {
+        000001: {
+            name: "Carlos Delfino",
+            desription: "Administrador",
+            roles: [...]
+            others...,
+            position: {lat: -3, lgt: 48, updated: 7777797777}
+        },
+        000002: {
+            name: "Outro usuário",
+            desription: "",
+            roles: [...]
+            others...,
+            position: {lat: -3, lgt: 48}
+        }
+    }
+    users_history_position:{
+        000001: {
+            "7777777777":{lat: -3.3, lgt: 48.3},
+            "7777777877":{lat: -3.4, lgt: 48.3},
+            "7777797777":{lat: -3.4, lgt: 48.5},
+        }
+    }
+```
+
+## Apoio e Patrocinio
+
 <a href="https://www.patreon.com/bePatron?u=12060988" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
 
 

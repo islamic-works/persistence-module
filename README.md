@@ -1,5 +1,6 @@
-# base
-Projeto Template
+# Módulo de Persistência
+
+Módulo para integração do sistema de persistência adotado com a aplicação, estas classes devem encapsular e abstrair juntamente com as do módulo de entidades toda a camada de persistência de forma a torna-la independente do sistema adotado, a aplicação não deve estar acoplada diretamente ao sistema de persistência final escolhido.
 
 <a href="https://www.patreon.com/bePatron?u=12060988" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
 

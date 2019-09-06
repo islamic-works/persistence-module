@@ -12,23 +12,49 @@ import { IslamicUser } from '../auth/islamic-user';
     providedIn: 'root'
 })
 export class PersistenceService {
-
     constructor(
         protected _settings: SettingsService
     ) {
-        var onValueEvent = function (result) {
-            console.log("Event type: " + result.type);
-            console.log("Key: " + result.key);
-            console.log("Value: " + JSON.stringify(result.value));
-        };
+        this._settings.debug && console.log("PersistenceService.new");
 
-        firebase.addValueEventListener(onValueEvent, "/users").then(
-            function (listenerWrapper) {
-                var path = listenerWrapper.path;
-                var listeners = listenerWrapper.listeners; // an Array of listeners added
-                // you can store the wrapper somewhere to later call 'removeEventListeners'
-            }
-        );
+    }
+
+    async init() {
+        this._settings.debug && console.log("PersistenceService.init");
+        return await firebase.init({ persist: true })
+            .then((result) => {
+                if (this.debug)
+                    console.log("PersistenceService.init firebase.init.then():", result);
+
+                firebase.keepInSync("/users", true).then(() => {
+
+                    var onValueEvent = (result: firebase.FBData) => {
+                        console.log("Event type: " + result.type);
+                        console.log("Key: " + result.key);
+                        console.log("Value: " + JSON.stringify(result.value));
+                    };
+
+                    firebase.addChildEventListener(onValueEvent, "/users").then(
+                        (listenerWrapper: firebase.AddEventListenerResult) => {
+                            this._settings.debug && console.log("PersistenceService.init firebase.init.then firebase.addChildEventListener");
+                            var path = listenerWrapper.path;
+                            var listeners = listenerWrapper.listeners; // an Array of listeners added
+                            // you can store the wrapper somewhere to later call 'removeEventListeners'
+                        }
+                    ).catch((error) => console.log("PersistenceService.init firebase.init.then firebase.addChildEventListener.catch", error));
+                });
+
+                return result;
+            })
+            .catch((error) => {
+                if (this.debug)
+                    console.log("AuthService.new(): firebase.init.catch()", error);
+                throw error;
+            })
+    }
+
+    async close() {
+        return Promise.resolve();
     }
 
     /**
@@ -40,15 +66,10 @@ export class PersistenceService {
 
     registerStatus(user: IslamicUser): void {
         firebase.setValue("/users/" + user.uid, user);
-
-        firebase.getValue("/users/" + user.uid + "/availability/hello")
-            .then(snapshot => console.log("authService.registerStatus() helloRef.get().then()", snapshot.value))
-            .catch(err => console.log("authService.registerStatus() helloRef.get().catch()", + err));
-
     }
 
     updateUserPosition(user: IslamicUser, position: GPSInfo) {
-        if (this._settings.debug)
+        if (this.debug)
             console.log("PersistenceService.updateUserPosition", user, position);
 
         position.updated = ServerValue.TIMESTAMP;
@@ -58,7 +79,7 @@ export class PersistenceService {
 
                 return firebase.getValue("/users/" + user.uid + "/position/updated")
                     .then((snapshot) => {
-                        if (this._settings.debug)
+                        if (this.debug)
                             console.log("PersistenceService.updateUserPosition firebase.getValue", snapshot);
 
                         return firebase
